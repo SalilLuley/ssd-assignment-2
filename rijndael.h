@@ -16,5 +16,9 @@
  */
 unsigned char *aes_encrypt_block(unsigned char *plaintext, unsigned char *key);
 unsigned char *aes_decrypt_block(unsigned char *ciphertext, unsigned char *key);
+unsigned char *expand_key(unsigned char *expandedKey, unsigned char *key);
+void core(unsigned char *word, int iteration);
+unsigned char getSBoxValue(unsigned char num);
+unsigned char getRconValue(unsigned char num);
 
 #endif
