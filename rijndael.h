@@ -15,10 +15,16 @@
  * encrypt or decrypt data)
  */
 unsigned char *aes_encrypt_block(unsigned char *plain_text, unsigned char *key);
-unsigned char *aes_decrypt_block(unsigned char *ciphertext,unsigned char *key);
+unsigned char *aes_decrypt_block(unsigned char *ciphertext, unsigned char *key);
 unsigned char *expand_key(unsigned char *expanded_key, unsigned char *key);
 void aes_key_schedule_core(unsigned char *word, int iteration);
 unsigned char get_s_box_value(unsigned char num);
 unsigned char get_rcon_value(unsigned char num);
+
+void aes_main(unsigned char *state, unsigned char *expanded_key,
+              int nbr_rounds);
+void create_round_key(unsigned char *expanded_key, unsigned char *roundKey);
+void add_round_key(unsigned char *state, unsigned char *roundKey);
+void sub_bytes(unsigned char *state);
 
 #endif
