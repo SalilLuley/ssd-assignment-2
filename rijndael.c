@@ -406,6 +406,53 @@ unsigned char *aes_encrypt_block(unsigned char *plain_text,
 // Decrypt
 
 /**
+ * Performs the inverse mix column operation on a given column.
+ *
+ * @param column The column to perform the inverse mix column operation on.
+ */
+void inv_mix_column(unsigned char *column) {
+  unsigned char cpy[4];
+  int i;
+  for (i = 0; i < 4; i++) {
+    cpy[i] = column[i];
+  }
+  column[0] = aes_galois_multiply(cpy[0], 14) ^ aes_galois_multiply(cpy[3], 9) ^
+              aes_galois_multiply(cpy[2], 13) ^ aes_galois_multiply(cpy[1], 11);
+  column[1] = aes_galois_multiply(cpy[1], 14) ^ aes_galois_multiply(cpy[0], 9) ^
+              aes_galois_multiply(cpy[3], 13) ^ aes_galois_multiply(cpy[2], 11);
+  column[2] = aes_galois_multiply(cpy[2], 14) ^ aes_galois_multiply(cpy[1], 9) ^
+              aes_galois_multiply(cpy[0], 13) ^ aes_galois_multiply(cpy[3], 11);
+  column[3] = aes_galois_multiply(cpy[3], 14) ^ aes_galois_multiply(cpy[2], 9) ^
+              aes_galois_multiply(cpy[1], 13) ^ aes_galois_multiply(cpy[0], 11);
+}
+
+/**
+ * Inverts the MixColumns operation on the given state array.
+ *
+ * @param state The state array to perform the operation on.
+ */
+void invert_mix_columns(unsigned char *state) {
+  int i, j;
+  unsigned char column[4];
+
+  // iterate over the 4 columns
+  for (i = 0; i < 4; i++) {
+    // construct one column by iterating over the 4 rows
+    for (j = 0; j < 4; j++) {
+      column[j] = state[(j * 4) + i];
+    }
+
+    // apply the inv_mix_column on one column
+    inv_mix_column(column);
+
+    // put the values back into the state
+    for (j = 0; j < 4; j++) {
+      state[(j * 4) + i] = column[j];
+    }
+  }
+}
+
+/**
  * Retrieves the inverse of a given number from the Rijndael S-Box.
  *
  * @param num The number to be inverted.
@@ -472,7 +519,12 @@ void aes_inv_main(unsigned char *state, unsigned char *expanded_key,
     invert_shift_rows(state);
     invert_sub_bytes(state);
     add_round_key(state, roundKey);
+    invert_mix_columns(state);
   }
+  create_round_key(expanded_key, roundKey);
+  invert_shift_rows(state);
+  invert_sub_bytes(state);
+  add_round_key(state, roundKey);
 }
 
 unsigned char *aes_decrypt_block(unsigned char *ciphertext,
