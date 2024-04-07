@@ -1,6 +1,26 @@
 /*
- * TODO: Add your name and student number here, along with
- *       a brief description of this code.
+ * Salil Luley - D23124871
+ * This file, rijndael.h, contains function declarations that are used for both
+ * encryption and decryption processes. The file starts with an include guard,
+ * #ifndef RIJNDAEL_H, #define RIJNDAEL_H, and #endif at the end. This is a
+ * common idiom used in C and C++ to prevent the same header file from being
+ * included more than once in a compilation unit. The #define
+ * BLOCK_ACCESS(block, row, col) (block[(row * 4) + col]) and #define BLOCK_SIZE
+ * 16 are macro definitions. The first one, BLOCK_ACCESS, is a utility macro to
+ * access a specific element in a 4x4 block. The second one, BLOCK_SIZE, defines
+ * the size of a block in AES, which is always 16 bytes. The function
+ * declarations that follow are the main components of the AES algorithm:
+ * aes_encrypt_block and aes_decrypt_block are the main entry points for
+ * encrypting and decrypting a block of data, respectively. expand_key is used
+ * to expand the encryption key to be used in the encryption and decryption
+ * processes. aes_key_schedule_core is a part of the key expansion process.
+ * get_s_box_value and get_rcon_value are used to retrieve values from the S-box
+ * and Rcon arrays, respectively, which are part of the AES algorithm. aes_main
+ * is the main function that performs the AES encryption. create_round_key,
+ * add_round_key, sub_bytes, shift_rows, shift_row, and mix_columns are all
+ * steps in the AES encryption process. invert_shift_rows, invert_sub_bytes, and
+ * invert_mix_columns are the inverse operations of shift_rows, sub_bytes, and
+ * mix_columns, respectively, and are used in the decryption process.
  */
 
 #ifndef RIJNDAEL_H

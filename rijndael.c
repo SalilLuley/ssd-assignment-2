@@ -253,6 +253,14 @@ void shift_rows(unsigned char *state) {
   for (i = 0; i < 4; i++) shift_row(state + i * 4, i);
 }
 
+/**
+ * Multiplies two bytes using the Galois Field (GF) multiplication algorithm.
+ *
+ * @param a The first byte to be multiplied.
+ * @param b The second byte to be multiplied.
+ * @return The result of multiplying the two bytes using the GF multiplication
+ * algorithm.
+ */
 unsigned char aes_galois_multiply(unsigned char a, unsigned char b) {
   unsigned char p = 0;
   unsigned char counter;
@@ -267,13 +275,19 @@ unsigned char aes_galois_multiply(unsigned char a, unsigned char b) {
   return p;
 }
 
+/**
+ * Mixes the columns of the AES state matrix using the Rijndael MixColumns
+ * operation.
+ *
+ * @param column The column to be mixed, represented as an array of 4 unsigned
+ * characters.
+ */
 void mix_column(unsigned char *column) {
   unsigned char cpy[4];
   int i;
   for (i = 0; i < 4; i++) {
     cpy[i] = column[i];
   }
-
   column[0] = aes_galois_multiply(cpy[0], 2) ^ aes_galois_multiply(cpy[3], 1) ^
               aes_galois_multiply(cpy[2], 1) ^ aes_galois_multiply(cpy[1], 3);
 
@@ -286,6 +300,7 @@ void mix_column(unsigned char *column) {
   column[3] = aes_galois_multiply(cpy[3], 2) ^ aes_galois_multiply(cpy[2], 1) ^
               aes_galois_multiply(cpy[1], 1) ^ aes_galois_multiply(cpy[0], 3);
 }
+
 /**
  * Mixes the columns of the state matrix using the MixColumns operation.
  *
@@ -294,16 +309,11 @@ void mix_column(unsigned char *column) {
 void mix_columns(unsigned char *state) {
   int i, j;
   unsigned char column[4];
-
-  // iterate over the 4 columns
   for (i = 0; i < 4; i++) {
-    // construct one column by iterating over the 4 rows
     for (j = 0; j < 4; j++) {
       column[j] = state[(j * 4) + i];
     }
-    // apply the mix_column on one column
     mix_column(column);
-    // put the values back into the state
     for (j = 0; j < 4; j++) {
       state[(j * 4) + i] = column[j];
     }
@@ -335,6 +345,7 @@ void aes_main(unsigned char *state, unsigned char *expanded_key,
   shift_rows(state);
   add_round_key(state, roundKey);
 }
+
 /**
  * This function should expand the round key. Given an input,
  * which is a single 128-bit key, it should return a 176-byte
@@ -382,7 +393,6 @@ unsigned char *expand_key(unsigned char *expanded_key, unsigned char *key) {
  */
 unsigned char *aes_encrypt_block(unsigned char *plain_text,
                                  unsigned char *key) {
-  // the number of rounds
   unsigned char *output =
       (unsigned char *)malloc(sizeof(unsigned char) * BLOCK_SIZE);
 
@@ -390,26 +400,18 @@ unsigned char *aes_encrypt_block(unsigned char *plain_text,
 
   int expanded_key_size = (16 * (nbr_rounds + 1));
 
-  // the expanded key
   unsigned char *expanded_key =
       (unsigned char *)malloc(expanded_key_size * sizeof(unsigned char));
-  // the 128 bit block to encode
   unsigned char block[16];
   int i, j;
 
-  // iterate over the columns
   for (i = 0; i < 4; i++) {
-    // iterate over the rows
     for (j = 0; j < 4; j++) block[(i + (j * 4))] = plain_text[(i * 4) + j];
   }
-
   expand_key(expanded_key, key);
-
-  // call the main AES function
   aes_main(block, expanded_key, nbr_rounds);
 
   for (i = 0; i < 4; i++) {
-    // iterate over the rows
     for (j = 0; j < 4; j++) output[(i * 4) + j] = block[(i + (j * 4))];
   }
   free(expanded_key);
@@ -515,6 +517,7 @@ void invert_shift_rows(unsigned char *state) {
   int i;
   for (i = 0; i < 4; i++) inv_shift_row(state + i * 4, i);
 }
+
 /**
  * Performs the inverse AES encryption algorithm on the given state using the
  * provided expanded key.
