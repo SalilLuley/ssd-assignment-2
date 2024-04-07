@@ -543,6 +543,11 @@ unsigned char *aes_decrypt_block(unsigned char *ciphertext,
   }
   expand_key(expanded_key, key);
   aes_inv_main(block, expanded_key, nbr_rounds);
+  for (i = 0; i < 4; i++) {
+    for (j = 0; j < 4; j++) output[(i * 4) + j] = block[(i + (j * 4))];
+  }
 
+  free(expanded_key);
+  expanded_key = NULL;
   return output;
 }
