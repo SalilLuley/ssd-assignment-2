@@ -322,6 +322,7 @@ void aes_main(unsigned char *state, unsigned char *expanded_key,
   int i = 0;
   unsigned char roundKey[16];
   create_round_key(expanded_key, roundKey);
+  add_round_key(state, roundKey);
   for (i = 1; i < nbr_rounds; i++) {
     create_round_key(expanded_key + 16 * i, roundKey);
     sub_bytes(state);
@@ -334,7 +335,6 @@ void aes_main(unsigned char *state, unsigned char *expanded_key,
   shift_rows(state);
   add_round_key(state, roundKey);
 }
-
 /**
  * This function should expand the round key. Given an input,
  * which is a single 128-bit key, it should return a 176-byte

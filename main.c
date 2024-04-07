@@ -33,13 +33,6 @@ int main() {
   unsigned char key[16] = {50, 20, 46, 86, 67, 9, 70, 27,
                            75, 17, 51, 17, 4,  8, 6,  99};
 
-  expand_key(expanded_key, key);
-
-  printf("\nExpanded Key :\n");
-  for (int i = 0; i < expanded_key_size; ++i) {
-    printf("%2.2x%c", expanded_key[i], ((i + 1) % 16) ? ' ' : '\n');
-  }
-
   unsigned char *ciphertext = aes_encrypt_block(plain_text, key);
   unsigned char *recovered_plaintext = aes_decrypt_block(ciphertext, key);
 
