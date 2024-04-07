@@ -37,7 +37,6 @@ int main() {
   unsigned char cipher_text[16];
   unsigned char decrypted_text[16];
 
-  // Define plain text and key
   unsigned char plain_text[16] = {1, 2,  3,  4,  5,  6,  7,  8,
                                   9, 10, 11, 12, 13, 14, 15, 16};
   unsigned char key[16] = {50, 20, 46, 86, 67, 9, 70, 27,
