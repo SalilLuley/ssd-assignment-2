@@ -3,9 +3,8 @@
 
 #include "rijndael.h"
 
-enum key_size
-{
-    SIZE_16 = 16,    
+enum key_size {
+  SIZE_16 = 16,
 };
 
 void print_128bit_block(unsigned char *block) {
@@ -23,29 +22,33 @@ void print_128bit_block(unsigned char *block) {
 }
 
 int main() {
-
   int expanded_key_size = 176;
   unsigned char expanded_key[expanded_key_size];
   enum key_size key_size = SIZE_16;
-  unsigned char cipher_text[16] ;
+  unsigned char cipher_text[16];
   unsigned char decrypted_text[16];
 
   unsigned char plain_text[16] = {1, 2,  3,  4,  5,  6,  7,  8,
-                                 9, 10, 11, 12, 13, 14, 15, 16};
+                                  9, 10, 11, 12, 13, 14, 15, 16};
   unsigned char key[16] = {50, 20, 46, 86, 67, 9, 70, 27,
                            75, 17, 51, 17, 4,  8, 6,  99};
-
 
   expand_key(expanded_key, key);
 
   printf("\nExpanded Key :\n");
-  for (int i = 0; i < expanded_key_size; ++i)
-  {
-      printf("%2.2x%c", expanded_key[i], ((i + 1) % 16) ? ' ' : '\n');
+  for (int i = 0; i < expanded_key_size; ++i) {
+    printf("%2.2x%c", expanded_key[i], ((i + 1) % 16) ? ' ' : '\n');
   }
 
   unsigned char *ciphertext = aes_encrypt_block(plain_text, key);
   unsigned char *recovered_plaintext = aes_decrypt_block(ciphertext, key);
+
+  printf("Cipher text:\n");
+  for (int i = 0; i < 16; i++) {
+    printf("%2x ", ciphertext[i]);
+  }
+
+  printf("\n");
 
   printf("############ ORIGINAL PLAINTEXT ###########\n");
   print_128bit_block(plain_text);

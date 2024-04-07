@@ -390,7 +390,15 @@ unsigned char *aes_encrypt_block(unsigned char *plain_text,
 
   expand_key(expanded_key, key);
 
-  // call main aes function
+  // call the main AES function
+  aes_main(block, expanded_key, nbr_rounds);
+
+  for (i = 0; i < 4; i++) {
+    // iterate over the rows
+    for (j = 0; j < 4; j++) output[(i * 4) + j] = block[(i + (j * 4))];
+  }
+  free(expanded_key);
+  expanded_key = NULL;
 
   return output;
 }
