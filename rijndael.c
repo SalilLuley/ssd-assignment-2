@@ -373,18 +373,33 @@ unsigned char *expand_key(unsigned char *expanded_key, unsigned char *key) {
   return expanded_key;
 }
 
+/**
+ * Encrypts a single block of plain_text using the AES algorithm.
+ *
+ * @param plain_text The plain_text block to be encrypted.
+ * @param key The encryption key.
+ * @return The encrypted block.
+ */
 unsigned char *aes_encrypt_block(unsigned char *plain_text,
                                  unsigned char *key) {
+  // the number of rounds
   unsigned char *output =
       (unsigned char *)malloc(sizeof(unsigned char) * BLOCK_SIZE);
+
   int nbr_rounds = 10;
+
   int expanded_key_size = (16 * (nbr_rounds + 1));
+
+  // the expanded key
   unsigned char *expanded_key =
       (unsigned char *)malloc(expanded_key_size * sizeof(unsigned char));
+  // the 128 bit block to encode
   unsigned char block[16];
   int i, j;
 
+  // iterate over the columns
   for (i = 0; i < 4; i++) {
+    // iterate over the rows
     for (j = 0; j < 4; j++) block[(i + (j * 4))] = plain_text[(i * 4) + j];
   }
 
@@ -527,10 +542,15 @@ void aes_inv_main(unsigned char *state, unsigned char *expanded_key,
   add_round_key(state, roundKey);
 }
 
+/**
+ * Decrypts a single AES block using the Rijndael algorithm.
+ *
+ * @param ciphertext The input ciphertext block to be decrypted.
+ * @param key The encryption key used for decryption.
+ * @return The decrypted plain_text block.
+ */
 unsigned char *aes_decrypt_block(unsigned char *ciphertext,
                                  unsigned char *key) {
-  unsigned char *output =
-      (unsigned char *)malloc(sizeof(unsigned char) * BLOCK_SIZE);
   int nbr_rounds = 10;
   int expanded_key_size = (16 * (nbr_rounds + 1));
   unsigned char block[16];
@@ -538,11 +558,14 @@ unsigned char *aes_decrypt_block(unsigned char *ciphertext,
   unsigned char *expanded_key =
       (unsigned char *)malloc(expanded_key_size * sizeof(unsigned char));
 
+  unsigned char *output =
+      (unsigned char *)malloc(sizeof(unsigned char) * BLOCK_SIZE);
   for (i = 0; i < 4; i++) {
     for (j = 0; j < 4; j++) block[(i + (j * 4))] = ciphertext[(i * 4) + j];
   }
   expand_key(expanded_key, key);
   aes_inv_main(block, expanded_key, nbr_rounds);
+
   for (i = 0; i < 4; i++) {
     for (j = 0; j < 4; j++) output[(i * 4) + j] = block[(i + (j * 4))];
   }
