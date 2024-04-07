@@ -26,5 +26,10 @@ void aes_main(unsigned char *state, unsigned char *expanded_key,
 void create_round_key(unsigned char *expanded_key, unsigned char *roundKey);
 void add_round_key(unsigned char *state, unsigned char *roundKey);
 void sub_bytes(unsigned char *state);
+void shift_rows(unsigned char *state);
+void shift_row(unsigned char *state, unsigned char nbr);
+
+void mix_columns(unsigned char *state);
+void mix_column(unsigned char *column);
 
 #endif

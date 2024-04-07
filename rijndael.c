@@ -226,6 +226,90 @@ void sub_bytes(unsigned char *state) {
 }
 
 /**
+ * Shifts the rows of the state array to the left by a specified number of
+ * positions.
+ *
+ * @param state The state array to be modified.
+ * @param nbr The number of positions to shift the rows.
+ */
+void shift_row(unsigned char *state, unsigned char nbr) {
+  int i, j;
+  unsigned char tmp;
+  // each iteration shifts the row to the left by 1
+  for (i = 0; i < nbr; i++) {
+    tmp = state[0];
+    for (j = 0; j < 3; j++) state[j] = state[j + 1];
+    state[3] = tmp;
+  }
+}
+
+/**
+ * Shifts the rows of the state matrix in the Rijndael encryption algorithm.
+ *
+ * @param state The state matrix to be modified.
+ */
+void shift_rows(unsigned char *state) {
+  int i;
+  for (i = 0; i < 4; i++) shift_row(state + i * 4, i);
+}
+
+unsigned char aes_galois_multiply(unsigned char a, unsigned char b) {
+  unsigned char p = 0;
+  unsigned char counter;
+  unsigned char hi_bit_set;
+  for (counter = 0; counter < 8; counter++) {
+    if ((b & 1) == 1) p ^= a;
+    hi_bit_set = (a & 0x80);
+    a <<= 1;
+    if (hi_bit_set == 0x80) a ^= 0x1b;
+    b >>= 1;
+  }
+  return p;
+}
+
+void mix_column(unsigned char *column) {
+  unsigned char cpy[4];
+  int i;
+  for (i = 0; i < 4; i++) {
+    cpy[i] = column[i];
+  }
+
+  column[0] = aes_galois_multiply(cpy[0], 2) ^ aes_galois_multiply(cpy[3], 1) ^
+              aes_galois_multiply(cpy[2], 1) ^ aes_galois_multiply(cpy[1], 3);
+
+  column[1] = aes_galois_multiply(cpy[1], 2) ^ aes_galois_multiply(cpy[0], 1) ^
+              aes_galois_multiply(cpy[3], 1) ^ aes_galois_multiply(cpy[2], 3);
+
+  column[2] = aes_galois_multiply(cpy[2], 2) ^ aes_galois_multiply(cpy[1], 1) ^
+              aes_galois_multiply(cpy[0], 1) ^ aes_galois_multiply(cpy[3], 3);
+
+  column[3] = aes_galois_multiply(cpy[3], 2) ^ aes_galois_multiply(cpy[2], 1) ^
+              aes_galois_multiply(cpy[1], 1) ^ aes_galois_multiply(cpy[0], 3);
+}
+/**
+ * Mixes the columns of the state matrix using the MixColumns operation.
+ *
+ * @param state The state matrix to be modified.
+ */
+void mix_columns(unsigned char *state) {
+  int i, j;
+  unsigned char column[4];
+
+  // iterate over the 4 columns
+  for (i = 0; i < 4; i++) {
+    // construct one column by iterating over the 4 rows
+    for (j = 0; j < 4; j++) {
+      column[j] = state[(j * 4) + i];
+    }
+    // apply the mix_column on one column
+    mix_column(column);
+    // put the values back into the state
+    for (j = 0; j < 4; j++) {
+      state[(j * 4) + i] = column[j];
+    }
+  }
+}
+/**
  * Performs the AES encryption algorithm on the given state using the expanded
  * key.
  *
@@ -241,7 +325,14 @@ void aes_main(unsigned char *state, unsigned char *expanded_key,
   for (i = 1; i < nbr_rounds; i++) {
     create_round_key(expanded_key + 16 * i, roundKey);
     sub_bytes(state);
+    shift_rows(state);
+    mix_columns(state);
+    add_round_key(state, roundKey);
   }
+  create_round_key(expanded_key + 16 * nbr_rounds, roundKey);
+  sub_bytes(state);
+  shift_rows(state);
+  add_round_key(state, roundKey);
 }
 
 /**
