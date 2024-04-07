@@ -35,5 +35,6 @@ void mix_column(unsigned char *column);
 void invert_shift_rows(unsigned char *state);
 unsigned char *aes_decrypt_block(unsigned char *ciphertext, unsigned char *key);
 void invert_shift_rows(unsigned char *state);
+void invert_sub_bytes(unsigned char *state)
 
 #endif

@@ -406,6 +406,28 @@ unsigned char *aes_encrypt_block(unsigned char *plain_text,
 // Decrypt
 
 /**
+ * Retrieves the inverse of a given number from the Rijndael S-Box.
+ *
+ * @param num The number to be inverted.
+ * @return The inverse of the given number from the Rijndael S-Box.
+ */
+unsigned char get_s_box_invert(unsigned char num) { return rs_box[num]; }
+
+/**
+ * Inverts the SubBytes operation on the given state array.
+ *
+ * This function applies the inverse S-box substitution to each byte in the
+ * state array. The inverse S-box substitution is performed by calling the
+ * `get_s_box_invert` function.
+ *
+ * @param state The state array to be modified.
+ */
+void invert_sub_bytes(unsigned char *state) {
+  int i;
+  for (i = 0; i < 16; i++) state[i] = get_s_box_invert(state[i]);
+}
+
+/**
  * Shifts the rows of the state matrix to the right by a specified number of
  * positions.
  *
@@ -448,6 +470,8 @@ void aes_inv_main(unsigned char *state, unsigned char *expanded_key,
   for (i = nbr_rounds - 1; i > 0; i--) {
     create_round_key(expanded_key + 16 * i, roundKey);
     invert_shift_rows(state);
+    invert_sub_bytes(state);
+    add_round_key(state, roundKey);
   }
 }
 
