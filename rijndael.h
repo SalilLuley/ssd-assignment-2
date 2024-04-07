@@ -15,7 +15,6 @@
  * encrypt or decrypt data)
  */
 unsigned char *aes_encrypt_block(unsigned char *plain_text, unsigned char *key);
-unsigned char *aes_decrypt_block(unsigned char *ciphertext, unsigned char *key);
 unsigned char *expand_key(unsigned char *expanded_key, unsigned char *key);
 void aes_key_schedule_core(unsigned char *word, int iteration);
 unsigned char get_s_box_value(unsigned char num);
@@ -31,5 +30,10 @@ void shift_row(unsigned char *state, unsigned char nbr);
 
 void mix_columns(unsigned char *state);
 void mix_column(unsigned char *column);
+
+// Decrypt
+void invert_shift_rows(unsigned char *state);
+unsigned char *aes_decrypt_block(unsigned char *ciphertext, unsigned char *key);
+void invert_shift_rows(unsigned char *state);
 
 #endif

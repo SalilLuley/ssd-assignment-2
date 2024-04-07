@@ -403,10 +403,70 @@ unsigned char *aes_encrypt_block(unsigned char *plain_text,
   return output;
 }
 
+// Decrypt
+
+/**
+ * Shifts the rows of the state matrix to the right by a specified number of
+ * positions.
+ *
+ * @param state The state matrix to be shifted.
+ * @param nbr The number of positions to shift the rows.
+ */
+void inv_shift_row(unsigned char *state, unsigned char nbr) {
+  int i, j;
+  unsigned char tmp;
+  for (i = 0; i < nbr; i++) {
+    tmp = state[3];
+    for (j = 3; j > 0; j--) state[j] = state[j - 1];
+    state[0] = tmp;
+  }
+}
+
+/**
+ * Inverts the shift rows operation on the given state array.
+ *
+ * @param state The state array to perform the operation on.
+ */
+void invert_shift_rows(unsigned char *state) {
+  int i;
+  for (i = 0; i < 4; i++) inv_shift_row(state + i * 4, i);
+}
+/**
+ * Performs the inverse AES encryption algorithm on the given state using the
+ * provided expanded key.
+ *
+ * @param state The state array to be decrypted.
+ * @param expanded_key The expanded key array used for decryption.
+ * @param nbr_rounds The number of rounds to be performed during decryption.
+ */
+void aes_inv_main(unsigned char *state, unsigned char *expanded_key,
+                  int nbr_rounds) {
+  int i = 0;
+  unsigned char roundKey[16];
+  create_round_key(expanded_key + 16 * nbr_rounds, roundKey);
+  add_round_key(state, roundKey);
+  for (i = nbr_rounds - 1; i > 0; i--) {
+    create_round_key(expanded_key + 16 * i, roundKey);
+    invert_shift_rows(state);
+  }
+}
+
 unsigned char *aes_decrypt_block(unsigned char *ciphertext,
                                  unsigned char *key) {
-  // TODO: Implement me!
   unsigned char *output =
       (unsigned char *)malloc(sizeof(unsigned char) * BLOCK_SIZE);
+  int nbr_rounds = 10;
+  int expanded_key_size = (16 * (nbr_rounds + 1));
+  unsigned char block[16];
+  int i, j;
+  unsigned char *expanded_key =
+      (unsigned char *)malloc(expanded_key_size * sizeof(unsigned char));
+
+  for (i = 0; i < 4; i++) {
+    for (j = 0; j < 4; j++) block[(i + (j * 4))] = ciphertext[(i * 4) + j];
+  }
+  expand_key(expanded_key, key);
+  aes_inv_main(block, expanded_key, nbr_rounds);
+
   return output;
 }
