@@ -14,11 +14,11 @@
  * entry point to the library for programmes hoping to use it to
  * encrypt or decrypt data)
  */
-unsigned char *aes_encrypt_block(unsigned char *plaintext, unsigned char *key);
-unsigned char *aes_decrypt_block(unsigned char *ciphertext, unsigned char *key);
-unsigned char *expand_key(unsigned char *expandedKey, unsigned char *key);
-void core(unsigned char *word, int iteration);
-unsigned char getSBoxValue(unsigned char num);
-unsigned char getRconValue(unsigned char num);
+unsigned char *aes_encrypt_block(unsigned char *plain_text, unsigned char *key);
+unsigned char *aes_decrypt_block(unsigned char *ciphertext,unsigned char *key);
+unsigned char *expand_key(unsigned char *expanded_key, unsigned char *key);
+void aes_key_schedule_core(unsigned char *word, int iteration);
+unsigned char get_s_box_value(unsigned char num);
+unsigned char get_rcon_value(unsigned char num);
 
 #endif
