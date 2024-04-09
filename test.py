@@ -24,59 +24,35 @@ class TestBlock(unittest.TestCase):
     def setUp(self):
         self.aes = AES(bytes(random_key))
         
-    def test_success(self):
+    def test_encrypt(self):
         """
         Test the success scenario for block encryption.
         """
-        py_ciphertext = self.aes.encrypt_block(random_plainText)
-        print("Python encrypted block in hex:")
-        for i in range(16):
-            print(hex(py_ciphertext[i]), end=" ")
-        print("\n")        
+        py_ciphertext = self.aes.encrypt_block(random_plainText)        
 
         plain_text = (c_ubyte * len(random_plainText))(*random_plainText)
         key = (c_ubyte * len(random_key))(*random_key)
 
-        # # Call the C function
-        c_ciphertext = rijndael.aes_encrypt_block(plain_text, key)
-        print("C encrypted block in hex:")
-        for i in range(16):
-            print(hex(c_ciphertext[i]), end=" ")            
-        print("\n")
-        
+        # Call the C function
+        c_ciphertext = rijndael.aes_encrypt_block(plain_text, key)               
         c_ciphertext_block_bytes = bytes(c_ciphertext[:16])
+
         self.assertEqual(py_ciphertext, c_ciphertext_block_bytes)
 
-    def test_success(self):
+    def test_decrypt(self):
         """
         Test the success scenario for block encryption and decryption.
         """
         ciphertext = self.aes.encrypt_block(random_plainText)        
-        py_plaintext = self.aes.decrypt_block(ciphertext)
-
-        for i in range(16):
-            print(hex(py_plaintext[i]), end=" ")
-
-    
+        py_plaintext = self.aes.decrypt_block(ciphertext)            
         plain_text = (c_ubyte * len(random_plainText))(*random_plainText)
         key = (c_ubyte * len(random_key))(*random_key)    
 
         # Call the C function
-        c_ciphertext = rijndael.aes_encrypt_block(plain_text, key)
-        
-        print("C encrypted block in hex:")
-        for i in range(16):
-            print(hex(c_ciphertext[i]), end=" ")            
-        print("\n")        
-
-        decrypted_block = rijndael.aes_decrypt_block(c_ciphertext, key)
-
-        print("C decrypted block in hex:",decrypted_block)
-        for i in range(16):
-            print(hex(decrypted_block[i]), end=" ")            
-        print("\n")
-
+        c_ciphertext = rijndael.aes_encrypt_block(plain_text, key)             
+        decrypted_block = rijndael.aes_decrypt_block(c_ciphertext, key)        
         c_ciphertext_block_bytes = bytes(decrypted_block[:16])
+        
         self.assertEqual(py_plaintext, c_ciphertext_block_bytes)
         
 
