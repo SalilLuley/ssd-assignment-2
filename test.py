@@ -1,6 +1,8 @@
 import unittest
 from ctypes import *
 from aes.aes import AES, encrypt, decrypt
+import secrets
+
 # Load the shared library
 rijndael = CDLL("./rijndael.so")
 # Define the function prototype
@@ -11,29 +13,22 @@ rijndael.aes_decrypt_block.argtypes = [POINTER(c_ubyte), POINTER(c_ubyte)]
 rijndael.aes_decrypt_block.restype = POINTER(c_ubyte)
 
 
+random_plainText = secrets.token_bytes(16)
+random_key = secrets.token_bytes(16)
 
 class TestBlock(unittest.TestCase):
     def setUp(self):
-        self.aes = AES(bytes([50, 20, 46, 86, 67, 9, 70, 27,
-         75, 17, 51, 17, 4,  8, 6,  99]))
+        self.aes = AES(bytes(random_key))
         
     def test_success(self):
-        py_plain_text = bytes([1, 2,  3,  4,  5,  6,  7,  8,
-                                  9, 10, 11, 12, 13, 14, 15, 16])
-        py_ciphertext = self.aes.encrypt_block(py_plain_text)
+        py_ciphertext = self.aes.encrypt_block(random_plainText)
         print("Python encrypted block in hex:")
         for i in range(16):
             print(hex(py_ciphertext[i]), end=" ")
-
-        #C
-        c_plain_text_bytes = bytes([1, 2,  3,  4,  5,  6,  7,  8,
-                    9, 10, 11, 12, 13, 14, 15, 16])
-        c_key_bytes = bytes([50, 20, 46, 86, 67, 9, 70, 27,
-                75, 17, 51, 17, 4,  8, 6,  99])
-
-        plain_text = (c_ubyte * len(c_plain_text_bytes))(*c_plain_text_bytes)
-        key = (c_ubyte * len(c_key_bytes))(*c_key_bytes)
         print("\n")        
+
+        plain_text = (c_ubyte * len(random_plainText))(*random_plainText)
+        key = (c_ubyte * len(random_key))(*random_key)
 
         # # Call the C function
         c_ciphertext = rijndael.aes_encrypt_block(plain_text, key)
@@ -47,22 +42,15 @@ class TestBlock(unittest.TestCase):
 
     def test_success(self):
         
-
-        ciphertext = [0x4b, 0x95, 0x86, 0x93, 0xb4, 0xe9, 0xc4, 0xeb, 0x92, 0xb3, 0xe8, 0x69, 0xaf, 0x40, 0xe0, 0xce]        
+        ciphertext = self.aes.encrypt_block(random_plainText)        
         py_plaintext = self.aes.decrypt_block(ciphertext)
 
         for i in range(16):
             print(hex(py_plaintext[i]), end=" ")
 
-
-        c_plain_text_bytes = bytes([1, 2,  3,  4,  5,  6,  7,  8,
-                    9, 10, 11, 12, 13, 14, 15, 16])
-        c_key_bytes = bytes([50, 20, 46, 86, 67, 9, 70, 27,
-                75, 17, 51, 17, 4,  8, 6,  99])
-
-        plain_text = (c_ubyte * len(c_plain_text_bytes))(*c_plain_text_bytes)
-        key = (c_ubyte * len(c_key_bytes))(*c_key_bytes)
-        print("\n")        
+    
+        plain_text = (c_ubyte * len(random_plainText))(*random_plainText)
+        key = (c_ubyte * len(random_key))(*random_key)    
 
         # Call the C function
         c_ciphertext = rijndael.aes_encrypt_block(plain_text, key)
