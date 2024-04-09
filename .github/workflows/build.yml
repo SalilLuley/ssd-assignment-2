@@ -10,3 +10,5 @@ jobs:
         run: |
           sudo apt install -y build-essential python-is-python3
           make
+      - name: Run the test
+        run: python3 test.py
