@@ -17,10 +17,17 @@ random_plainText = secrets.token_bytes(16)
 random_key = secrets.token_bytes(16)
 
 class TestBlock(unittest.TestCase):
+    """
+    A test case for the block encryption and decryption functionality.
+    """
+
     def setUp(self):
         self.aes = AES(bytes(random_key))
         
     def test_success(self):
+        """
+        Test the success scenario for block encryption.
+        """
         py_ciphertext = self.aes.encrypt_block(random_plainText)
         print("Python encrypted block in hex:")
         for i in range(16):
@@ -41,7 +48,9 @@ class TestBlock(unittest.TestCase):
         self.assertEqual(py_ciphertext, c_ciphertext_block_bytes)
 
     def test_success(self):
-        
+        """
+        Test the success scenario for block encryption and decryption.
+        """
         ciphertext = self.aes.encrypt_block(random_plainText)        
         py_plaintext = self.aes.decrypt_block(ciphertext)
 
