@@ -1,12 +1,25 @@
+// Salil Luley - D23124871
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "rijndael.h"
 
+/**
+ * @brief Enumeration representing different key sizes.
+ *
+ * This enumeration defines the different key sizes that can be used in the
+ * program. The SIZE_16 value represents a key size of 16 bytes.
+ */
 enum key_size {
   SIZE_16 = 16,
 };
 
+/**
+ * Prints a 128-bit block of unsigned characters.
+ *
+ * @param block The 128-bit block to be printed.
+ */
 void print_128bit_block(unsigned char *block) {
   for (int i = 0; i < 4; i++) {
     for (int j = 0; j < 4; j++) {

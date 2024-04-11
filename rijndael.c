@@ -1,5 +1,6 @@
 /**
  *  Salil Luley - D23124871
+ * This is a library in C that that implements a 128 bit varient of AES.
  */
 
 #include "rijndael.h"
